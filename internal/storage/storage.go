@@ -10,12 +10,10 @@ import (
 	pb "github.com/krekio/TagesTest/protos"
 )
 
-// Объект Storage-а.
 type FileStorage struct {
 	storagePath string
 }
 
-// Инициализация Storege-a.
 func NewFileStorage(path string) (*FileStorage, error) {
 	if _, err := os.Stat(path); err != nil {
 		if err = os.MkdirAll(path, os.ModePerm); err != nil {
@@ -26,7 +24,6 @@ func NewFileStorage(path string) (*FileStorage, error) {
 	return &FileStorage{storagePath: path}, nil
 }
 
-// Реализация метода Upload.
 func (s *FileStorage) Upload(stream pb.FileService_UploadFileServer) error {
 	var filename string
 	var file *os.File
@@ -89,7 +86,7 @@ func (s *FileStorage) Download(filename string, stream pb.FileService_DownloadFi
 	filePath := filepath.Join(s.storagePath, filename)
 	file, err := os.Open(filePath)
 	if err != nil {
-		return errors.New("файл не найден")
+		return errors.New("Ошибка скачивания файла")
 	}
 	defer file.Close()
 
