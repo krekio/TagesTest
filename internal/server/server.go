@@ -2,45 +2,49 @@ package server
 
 import (
 	"context"
-
 	"github.com/krekio/TagesTest/internal/storage"
 	pb "github.com/krekio/TagesTest/protos"
+	"golang.org/x/sync/semaphore"
 )
 
-type fileServiceServer struct {
-	pb.UnimplementedFileServiceServer
+type FileServiceServer struct {
 	fileStorage           *storage.FileStorage
-	uploadDownloadLimiter chan struct{}
-	listLimiter           chan struct{}
+	uploadDownloadLimiter *semaphore.Weighted
+	listLimiter           *semaphore.Weighted
 }
 
-func NewFileServiceServer(storage *storage.FileStorage) pb.FileServiceServer {
-	return &fileServiceServer{
+func NewFileServiceServer(storage *storage.FileStorage) *FileServiceServer {
+	return &FileServiceServer{
 		fileStorage:           storage,
-		uploadDownloadLimiter: make(chan struct{}, 10),
-		listLimiter:           make(chan struct{}, 100),
+		uploadDownloadLimiter: semaphore.NewWeighted(10),
+		listLimiter:           semaphore.NewWeighted(100),
 	}
 }
 
-func (s *fileServiceServer) UploadFile(stream pb.FileService_UploadFileServer) error {
-
-	s.uploadDownloadLimiter <- struct{}{}
-	defer func() { <-s.uploadDownloadLimiter }()
+func (s *FileServiceServer) UploadFile(stream pb.FileService_UploadFileServer) error {
+	if err := s.uploadDownloadLimiter.Acquire(context.Background(), 1); err != nil {
+		return err
+	}
+	defer s.uploadDownloadLimiter.Release(1)
 
 	return s.fileStorage.Upload(stream)
 }
 
-func (s *fileServiceServer) ListFiles(ctx context.Context, req *pb.ListFilesRequest) (*pb.ListFilesResponse, error) {
-	s.listLimiter <- struct{}{}
-	defer func() { <-s.listLimiter }()
+func (s *FileServiceServer) ListFiles(ctx context.Context, req *pb.ListFilesRequest) (*pb.ListFilesResponse, error) {
+	if err := s.listLimiter.Acquire(context.Background(), 1); err != nil {
+		return nil, err
+	}
+	defer s.listLimiter.Release(1)
 
 	return s.fileStorage.List()
 }
 
-func (s *fileServiceServer) DownloadFile(req *pb.DownloadFileRequest, stream pb.FileService_DownloadFileServer) error {
+func (s *FileServiceServer) DownloadFile(req *pb.DownloadFileRequest, stream pb.FileService_DownloadFileServer) error {
 
-	s.uploadDownloadLimiter <- struct{}{}
-	defer func() { <-s.uploadDownloadLimiter }()
+	if err := s.uploadDownloadLimiter.Acquire(context.Background(), 1); err != nil {
+		return err
+	}
+	defer s.uploadDownloadLimiter.Release(1)
 
 	return s.fileStorage.Download(req.Filename, stream)
 }
