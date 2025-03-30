@@ -8,7 +8,6 @@ package gen_proto
 
 import (
 	context "context"
-	"github.com/krekio/TagesTest/internal/server"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -120,7 +119,7 @@ type UnsafeFileServiceServer interface {
 	mustEmbedUnimplementedFileServiceServer()
 }
 
-func RegisterFileServiceServer(s grpc.ServiceRegistrar, srv *server.FileServiceServer) {
+func RegisterFileServiceServer(s grpc.ServiceRegistrar, srv FileServiceServer) {
 	// If the following call pancis, it indicates UnimplementedFileServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization

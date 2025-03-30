@@ -9,6 +9,7 @@ import (
 )
 
 type FileServiceServer struct {
+	pb.UnimplementedFileServiceServer
 	fileStorage           *storage.FileStorage
 	uploadDownloadLimiter *semaphore.Weighted
 	listLimiter           *semaphore.Weighted
