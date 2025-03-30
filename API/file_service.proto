@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package tages;
 
-option go_package = "./pb";
+option go_package = "github.com/krekio/TestTages/api";
 
 service rpcFileService {
   //UploadFile - загрузка стрима файлов на сервер. Принимает message(UploadFileRequest),
@@ -10,9 +10,9 @@ service rpcFileService {
   rpc UploadFile (stream UploadFileRequest) returns (UploadFileResponse);
 
   //GetFiles - получение списка файлов.
-  rpc GetFiles (GetFilesRequest) returns (stream GetFilesResponse);
+  rpc GetFiles (GetFilesRequest) returns (GetFilesResponse);
 
-//DownloadFile - скачивание файлов.
+  //DownloadFile - скачивание файлов.
   rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileResponse);
 }
 
