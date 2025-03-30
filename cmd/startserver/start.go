@@ -2,13 +2,14 @@ package server
 
 import (
 	"fmt"
+	"log"
+	"net"
+
 	"github.com/krekio/TagesTest/config"
 	"github.com/krekio/TagesTest/internal/server"
 	"github.com/krekio/TagesTest/internal/storage"
 	pb "github.com/krekio/TagesTest/protos"
 	"google.golang.org/grpc"
-	"log"
-	"net"
 )
 
 func Run() {

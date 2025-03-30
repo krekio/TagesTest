@@ -2,11 +2,12 @@ package storage
 
 import (
 	"errors"
-	pb "github.com/krekio/TagesTest/protos"
 	"io"
 	"os"
 	"path/filepath"
 	"time"
+
+	pb "github.com/krekio/TagesTest/protos"
 )
 
 // Объект Storage-а.
@@ -25,7 +26,7 @@ func NewFileStorage(path string) (*FileStorage, error) {
 	return &FileStorage{storagePath: path}, nil
 }
 
-//Реализация метода Upload.
+// Реализация метода Upload.
 func (s *FileStorage) Upload(stream pb.FileService_UploadFileServer) error {
 	var filename string
 	var file *os.File
